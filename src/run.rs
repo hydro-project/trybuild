@@ -19,7 +19,7 @@ use std::path::{Path, PathBuf};
 use std::str;
 
 #[derive(Debug)]
-pub(crate) struct Project {
+pub struct Project {
     pub dir: Directory,
     source_dir: Directory,
     pub target_dir: Directory,
@@ -35,7 +35,7 @@ pub(crate) struct Project {
 }
 
 #[derive(Debug)]
-pub(crate) struct PathDependency {
+pub struct PathDependency {
     pub name: String,
     pub normalized_path: Directory,
 }
@@ -46,7 +46,7 @@ struct Report {
 }
 
 impl Runner {
-    pub(crate) fn run(&mut self) {
+    pub fn run(&mut self) {
         let mut tests = expand_globs(&self.tests);
         filter(&mut tests);
 
