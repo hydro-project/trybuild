@@ -10,7 +10,7 @@ use std::mem;
 use std::path::Path;
 
 #[derive(Copy, Clone)]
-pub(crate) struct Context<'a> {
+pub struct Context<'a> {
     pub krate: &'a str,
     pub source_dir: &'a Directory,
     pub workspace: &'a Directory,
@@ -79,7 +79,7 @@ normalizations! {
 ///
 /// There is one "preferred" variation which is what we print when the stderr
 /// file is absent or not a match.
-pub(crate) fn diagnostics(output: &str, context: Context) -> Variations {
+pub fn diagnostics(output: &str, context: Context) -> Variations {
     let output = output.replace("\r\n", "\n");
 
     let mut result = Variations::default();
@@ -90,7 +90,7 @@ pub(crate) fn diagnostics(output: &str, context: Context) -> Variations {
     result
 }
 
-pub(crate) struct Variations {
+pub struct Variations {
     variations: [String; Normalization::ALL.len()],
 }
 
@@ -113,7 +113,7 @@ impl Variations {
     }
 }
 
-pub(crate) fn trim<S: AsRef<[u8]>>(output: S) -> String {
+pub fn trim<S: AsRef<[u8]>>(output: S) -> String {
     let bytes = output.as_ref();
     let mut normalized = String::from_utf8_lossy(bytes).into_owned();
 

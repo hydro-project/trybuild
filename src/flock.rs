@@ -9,7 +9,7 @@ use std::time::{Duration, SystemTime};
 
 static LOCK: Mutex<()> = Mutex::new(());
 
-pub(crate) struct Lock {
+pub struct Lock {
     intraprocess_guard: Guard,
     lockfile: FileLock,
 }

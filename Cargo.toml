@@ -1,15 +1,15 @@
 [package]
-name = "trybuild"
+name = "trybuild-internals-api"
 version = "1.0.114"
-authors = ["David Tolnay <dtolnay@gmail.com>"]
+authors = ["Shadaj Laddad <shadaj@users.noreply.github.com>"]
 categories = ["development-tools::testing"]
-description = "Test harness for ui tests of compiler diagnostics"
-documentation = "https://docs.rs/trybuild"
+description = "A fork of trybuild with the internals exposed as a public API"
+documentation = "https://docs.rs/trybuild-internals-api"
 edition = "2021"
 exclude = ["build.rs", "screenshots/*"]
 keywords = ["macros", "testing", "dev-dependencies"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/dtolnay/trybuild"
+repository = "https://github.com/hydro-project/trybuild"
 rust-version = "1.76"
 
 [features]

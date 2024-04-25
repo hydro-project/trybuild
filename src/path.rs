@@ -1,27 +1,29 @@
 use std::path::{Path, PathBuf};
 
+#[macro_export]
 macro_rules! path {
     ($($tt:tt)+) => {
-        tokenize_path!([] [] $($tt)+)
+        $crate::tokenize_path!([] [] $($tt)+)
     };
 }
 
 // Private implementation detail.
+#[macro_export]
 macro_rules! tokenize_path {
     ([$(($($component:tt)+))*] [$($cur:tt)+] /) => {
-        crate::directory::Directory::new(tokenize_path!([$(($($component)+))*] [$($cur)+]))
+        $crate::directory::Directory::new($crate::tokenize_path!([$(($($component)+))*] [$($cur)+]))
     };
 
     ([$(($($component:tt)+))*] [$($cur:tt)+] / $($rest:tt)+) => {
-        tokenize_path!([$(($($component)+))* ($($cur)+)] [] $($rest)+)
+        $crate::tokenize_path!([$(($($component)+))* ($($cur)+)] [] $($rest)+)
     };
 
     ([$(($($component:tt)+))*] [$($cur:tt)*] $first:tt $($rest:tt)*) => {
-        tokenize_path!([$(($($component)+))*] [$($cur)* $first] $($rest)*)
+        $crate::tokenize_path!([$(($($component)+))*] [$($cur)* $first] $($rest)*)
     };
 
     ([$(($($component:tt)+))*] [$($cur:tt)+]) => {
-        tokenize_path!([$(($($component)+))* ($($cur)+)])
+        $crate::tokenize_path!([$(($($component)+))* ($($cur)+)])
     };
 
     ([$(($($component:tt)+))*]) => {{

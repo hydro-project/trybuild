@@ -20,23 +20,23 @@ use std::path::{Path, PathBuf};
 use std::str;
 
 #[derive(Debug)]
-pub(crate) struct Project {
+pub struct Project {
     pub dir: Directory,
-    source_dir: Directory,
+    pub source_dir: Directory,
     pub target_dir: Directory,
     pub name: String,
-    update: Update,
+    pub update: Update,
     pub has_pass: bool,
-    has_compile_fail: bool,
+    pub has_compile_fail: bool,
     pub features: Option<Vec<String>>,
     pub workspace: Directory,
     pub path_dependencies: Vec<PathDependency>,
-    manifest: Manifest,
+    pub manifest: Manifest,
     pub keep_going: bool,
 }
 
 #[derive(Debug)]
-pub(crate) struct PathDependency {
+pub struct PathDependency {
     pub name: String,
     pub normalized_path: Directory,
 }
@@ -47,7 +47,7 @@ struct Report {
 }
 
 impl Runner {
-    pub(crate) fn run(&mut self) {
+    pub fn run(&mut self) {
         let mut tests = expand_globs(&self.tests);
         filter(&mut tests);
 
@@ -152,7 +152,7 @@ impl Runner {
         fs::create_dir_all(&project_dir)?;
 
         let project_name = format!("{}-tests", crate_name);
-        let manifest = self.make_manifest(
+        let manifest = Self::make_manifest(
             &workspace,
             &project_name,
             &source_dir,
@@ -196,8 +196,7 @@ impl Runner {
         Ok(())
     }
 
-    fn make_manifest(
-        &self,
+    pub fn make_manifest(
         workspace: &Directory,
         project_name: &str,
         source_dir: &Directory,

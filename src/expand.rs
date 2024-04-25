@@ -5,14 +5,14 @@ use std::collections::BTreeMap as Map;
 use std::path::PathBuf;
 
 #[derive(Debug)]
-pub(crate) struct ExpandedTest {
+pub struct ExpandedTest {
     pub name: Name,
     pub test: Test,
     pub error: Option<Error>,
     is_from_glob: bool,
 }
 
-pub(crate) fn expand_globs(tests: &[Test]) -> Vec<ExpandedTest> {
+pub fn expand_globs(tests: &[Test]) -> Vec<ExpandedTest> {
     let mut set = ExpandedTestSet::new();
 
     for test in tests {
