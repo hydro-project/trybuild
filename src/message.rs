@@ -6,14 +6,14 @@ use std::path::Path;
 use std::process::Output;
 use termcolor::Color::{self, *};
 
-pub(crate) enum Level {
+pub enum Level {
     Fail,
     Warn,
 }
 
-pub(crate) use self::Level::*;
+pub use self::Level::*;
 
-pub(crate) fn prepare_fail(err: Error) {
+pub fn prepare_fail(err: Error) {
     if err.already_printed() {
         return;
     }
@@ -25,7 +25,7 @@ pub(crate) fn prepare_fail(err: Error) {
     println!();
 }
 
-pub(crate) fn test_fail(err: Error) {
+pub fn test_fail(err: Error) {
     if err.already_printed() {
         return;
     }
@@ -38,19 +38,19 @@ pub(crate) fn test_fail(err: Error) {
     println!();
 }
 
-pub(crate) fn no_tests_enabled() {
+pub fn no_tests_enabled() {
     term::color(Yellow);
     println!("There are no trybuild tests enabled yet.");
     term::reset();
 }
 
-pub(crate) fn ok() {
+pub fn ok() {
     term::color(Green);
     println!("ok");
     term::reset();
 }
 
-pub(crate) fn begin_test(test: &Test, show_expected: bool) {
+pub fn begin_test(test: &Test, show_expected: bool) {
     let display_name = test.path.as_os_str().to_string_lossy();
 
     print!("test ");
@@ -68,14 +68,14 @@ pub(crate) fn begin_test(test: &Test, show_expected: bool) {
     print!(" ... ");
 }
 
-pub(crate) fn failed_to_build(stderr: &str) {
+pub fn failed_to_build(stderr: &str) {
     term::bold_color(Red);
     println!("error");
     snippet(Red, stderr);
     println!();
 }
 
-pub(crate) fn should_not_have_compiled() {
+pub fn should_not_have_compiled() {
     term::bold_color(Red);
     println!("error");
     term::color(Red);
@@ -84,7 +84,7 @@ pub(crate) fn should_not_have_compiled() {
     println!();
 }
 
-pub(crate) fn write_stderr_wip(wip_path: &Path, stderr_path: &Path, stderr: &str) {
+pub fn write_stderr_wip(wip_path: &Path, stderr_path: &Path, stderr: &str) {
     let wip_path = wip_path.to_string_lossy();
     let stderr_path = stderr_path.to_string_lossy();
 
@@ -102,7 +102,7 @@ pub(crate) fn write_stderr_wip(wip_path: &Path, stderr_path: &Path, stderr: &str
     println!();
 }
 
-pub(crate) fn overwrite_stderr(stderr_path: &Path, stderr: &str) {
+pub fn overwrite_stderr(stderr_path: &Path, stderr: &str) {
     let stderr_path = stderr_path.to_string_lossy();
 
     term::bold_color(Yellow);
@@ -115,7 +115,7 @@ pub(crate) fn overwrite_stderr(stderr_path: &Path, stderr: &str) {
     println!();
 }
 
-pub(crate) fn mismatch(expected: &str, actual: &str) {
+pub fn mismatch(expected: &str, actual: &str) {
     term::bold_color(Red);
     println!("mismatch");
     term::reset();
@@ -142,7 +142,7 @@ pub(crate) fn mismatch(expected: &str, actual: &str) {
     println!();
 }
 
-pub(crate) fn output(warnings: &str, output: &Output) {
+pub fn output(warnings: &str, output: &Output) {
     let success = output.status.success();
     let stdout = normalize::trim(&output.stdout);
     let stderr = normalize::trim(&output.stderr);
@@ -180,7 +180,7 @@ pub(crate) fn output(warnings: &str, output: &Output) {
     }
 }
 
-pub(crate) fn fail_output(level: Level, stdout: &str) {
+pub fn fail_output(level: Level, stdout: &str) {
     let color = match level {
         Fail => Red,
         Warn => Yellow,
@@ -194,7 +194,7 @@ pub(crate) fn fail_output(level: Level, stdout: &str) {
     }
 }
 
-pub(crate) fn warnings(warnings: &str) {
+pub fn warnings(warnings: &str) {
     if warnings.is_empty() {
         return;
     }

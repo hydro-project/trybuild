@@ -267,21 +267,21 @@ mod term;
 #[macro_use]
 mod path;
 
-mod cargo;
-mod dependencies;
-mod diff;
-mod directory;
-mod env;
-mod error;
-mod expand;
-mod features;
-mod flock;
-mod inherit;
-mod manifest;
-mod message;
-mod normalize;
-mod run;
-mod rustflags;
+pub mod cargo;
+pub mod dependencies;
+pub mod diff;
+pub mod directory;
+pub mod env;
+pub mod error;
+pub mod expand;
+pub mod features;
+pub mod flock;
+pub mod inherit;
+pub mod manifest;
+pub mod message;
+pub mod normalize;
+pub mod run;
+pub mod rustflags;
 
 use std::cell::RefCell;
 use std::panic::RefUnwindSafe;
@@ -294,12 +294,12 @@ pub struct TestCases {
 }
 
 #[derive(Debug)]
-struct Runner {
+pub struct Runner {
     tests: Vec<Test>,
 }
 
 #[derive(Clone, Debug)]
-struct Test {
+pub struct Test {
     path: PathBuf,
     expected: Expected,
 }

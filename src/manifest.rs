@@ -6,7 +6,7 @@ use std::ffi::OsStr;
 use std::path::PathBuf;
 
 #[derive(Serialize, Debug)]
-pub(crate) struct Manifest {
+pub struct Manifest {
     #[serde(rename = "cargo-features", skip_serializing_if = "Vec::is_empty")]
     pub cargo_features: Vec<String>,
     pub package: Package,
@@ -29,7 +29,7 @@ pub(crate) struct Manifest {
 }
 
 #[derive(Serialize, Debug)]
-pub(crate) struct Package {
+pub struct Package {
     pub name: String,
     pub version: String,
     pub edition: Edition,
@@ -39,7 +39,7 @@ pub(crate) struct Package {
 }
 
 #[derive(Serialize, Deserialize, Default, Debug)]
-pub(crate) enum Edition {
+pub enum Edition {
     #[default]
     #[serde(rename = "2015")]
     E2015,
@@ -52,16 +52,16 @@ pub(crate) enum Edition {
 }
 
 #[derive(Serialize, Debug)]
-pub(crate) struct Bin {
+pub struct Bin {
     pub name: Name,
     pub path: PathBuf,
 }
 
 #[derive(Serialize, Clone, Debug)]
-pub(crate) struct Name(pub String);
+pub struct Name(pub String);
 
 #[derive(Serialize, Debug)]
-pub(crate) struct Workspace {
+pub struct Workspace {
     #[serde(skip_serializing_if = "Map::is_empty")]
     pub dependencies: Map<String, Dependency>,
 }

@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(transparent)]
-pub(crate) struct Directory {
+pub struct Directory {
     path: PathBuf,
 }
 

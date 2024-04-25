@@ -6,7 +6,7 @@ use std::ffi::OsStr;
 use std::fs;
 use std::path::PathBuf;
 
-pub(crate) fn find() -> Option<Vec<String>> {
+pub fn find() -> Option<Vec<String>> {
     // We try the legacy layout first while the new Cargo build-dir layout is
     // still new. Eventually we should flip these.
     try_find_legacy_build_dir_layout()

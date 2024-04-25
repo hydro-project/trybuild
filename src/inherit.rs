@@ -4,12 +4,12 @@ use std::fmt;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
-pub(crate) struct InheritEdition {
+pub struct InheritEdition {
     #[allow(dead_code)]
     pub workspace: True,
 }
 
-pub(crate) struct True;
+pub struct True;
 
 impl<'de> Deserialize<'de> for True {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
