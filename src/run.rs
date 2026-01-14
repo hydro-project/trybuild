@@ -294,10 +294,11 @@ impl Runner {
             workspace: Some(Workspace {
                 dependencies: workspace_manifest.workspace.dependencies,
             }),
-            // Within a workspace, only the [patch] and [replace] sections in
+            // Within a workspace, only the [patch] / [replace] / [profile] sections in
             // the workspace root's Cargo.toml are applied by Cargo.
             patch: workspace_manifest.patch,
             replace: workspace_manifest.replace,
+            profile: workspace_manifest.profile,
         };
 
         manifest.bins.push(Bin {

@@ -81,6 +81,8 @@ pub struct WorkspaceManifest {
     pub patch: Map<String, RegistryPatch>,
     #[serde(default)]
     pub replace: Map<String, Patch>,
+    #[serde(default)]
+    pub profile: Map<String, Value>,
 }
 
 #[derive(Deserialize, Default, Debug)]
