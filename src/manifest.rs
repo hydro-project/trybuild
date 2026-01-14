@@ -1,6 +1,7 @@
 use crate::dependencies::{Dependency, Patch, RegistryPatch, TargetDependencies};
 use serde::ser::{SerializeMap, Serializer};
 use serde_derive::{Deserialize, Serialize};
+use serde_json::Value;
 use std::collections::BTreeMap as Map;
 use std::ffi::OsStr;
 use std::path::PathBuf;
@@ -26,6 +27,8 @@ pub struct Manifest {
     pub patch: Map<String, RegistryPatch>,
     #[serde(skip_serializing_if = "Map::is_empty")]
     pub replace: Map<String, Patch>,
+    #[serde(skip_serializing_if = "Map::is_empty")]
+    pub profile: Map<String, Value>,
 }
 
 #[derive(Serialize, Debug)]
