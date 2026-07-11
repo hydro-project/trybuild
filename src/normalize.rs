@@ -64,6 +64,7 @@ normalizations! {
     DependencyVersion,
     HeadingNote,
     UnindentSuggestion,
+    CustomRegistry,
     // New normalization steps are to be inserted here at the end so that any
     // snapshots saved before your normalization change remain passing.
 }
@@ -303,7 +304,7 @@ impl<'a> Filter<'a> {
             if self.normalization >= CargoRegistry && !other_crate {
                 // --> /home/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.64/src/de.rs:2584:8
                 // --> $CARGO/serde_json-1.0.64/src/de.rs:2584:8
-                if normalize_cargo_registry(&mut line, indent) {
+                if normalize_cargo_registry(&mut line, indent, self.normalization) {
                     other_crate = true;
                     if self.normalization >= DependencyVersion {
                         let rest = &line[indent + 11..];
@@ -464,7 +465,11 @@ fn is_ascii_lowercase_hex(s: &str) -> bool {
 //   .../registry/src/{name}-{16-hex-chars}/...
 // and replaces the prefix up to and including the hash with `$CARGO`.
 // Returns true if a substitution was made.
-fn normalize_cargo_registry(line: &mut String, indent: usize) -> bool {
+fn normalize_cargo_registry(
+    line: &mut String,
+    indent: usize,
+    normalization: Normalization,
+) -> bool {
     let prefix = "/registry/src/";
     let Some(pos) = line.find(prefix) else {
         return false;
@@ -474,11 +479,15 @@ fn normalize_cargo_registry(line: &mut String, indent: usize) -> bool {
         return false;
     };
     let segment = &rest[..slash];
-    let Some(i) = segment.rfind('-') else {
+    let Some((registry, hash)) = segment.rsplit_once('-') else {
         return false;
     };
-    let hash = &segment[i + 1..];
-    if hash.len() != 16 || !is_ascii_lowercase_hex(hash) {
+    if !((normalization >= CustomRegistry
+        || registry == "github.com"
+        || registry == "index.crates.io")
+        && hash.len() == 16
+        && is_ascii_lowercase_hex(hash))
+    {
         return false;
     }
     let hash_end = pos + prefix.len() + slash;
