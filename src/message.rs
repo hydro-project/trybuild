@@ -1,6 +1,6 @@
 use crate::diff::{Diff, Render};
 use crate::error::Error;
-use crate::{normalize, term, Expected, Test};
+use crate::{Expected, Test, normalize, term};
 use std::env;
 use std::path::Path;
 use std::process::Output;

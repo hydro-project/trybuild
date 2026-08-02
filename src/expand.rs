@@ -1,6 +1,6 @@
+use crate::Test;
 use crate::error::{Error, Result};
 use crate::manifest::Name;
-use crate::Test;
 use std::collections::BTreeMap as Map;
 use std::path::PathBuf;
 
