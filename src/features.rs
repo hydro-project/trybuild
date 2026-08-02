@@ -7,7 +7,11 @@ use std::fs;
 use std::path::PathBuf;
 
 pub(crate) fn find() -> Option<Vec<String>> {
-    try_find().ok()
+    // NOTE: We try the legacy layout first while the new Cargo build-dir layout is
+    //       still new. Eventually we should flip these to avoid unesscary file IO.
+    try_find_legacy_build_dir_layout()
+        .or_else(|_| try_find())
+        .ok()
 }
 
 struct Ignored;
@@ -25,6 +29,41 @@ struct Build {
 }
 
 fn try_find() -> Result<Vec<String>, Ignored> {
+    // Should be something like target/debug/build/$CRATE/$HASH/out/test_name-HASH
+    let test_binary = env::args_os().next().ok_or(Ignored)?;
+
+    let fingerprint_dir = {
+        let mut p = PathBuf::from(&test_binary);
+        p.pop(); // bin name
+        p.pop(); // `out`
+        p.join("fingerprint")
+    };
+
+    let mut json_matches = Vec::new();
+    for entry in fingerprint_dir.read_dir()? {
+        let entry = entry?;
+        let is_file = entry.file_type()?.is_file();
+        let is_json = entry.path().extension() == Some(OsStr::new("json"));
+        if is_file && is_json {
+            json_matches.push(entry.path());
+        }
+    }
+
+    // The features are stored in target/debug/build/$CRATE/$HASH/fingerprint/*.json
+    if json_matches.len() != 1 {
+        return Err(Ignored);
+    }
+
+    let build_json = fs::read_to_string(&json_matches[0])?;
+    let build: Build = serde_json::from_str(&build_json)?;
+    Ok(build.features)
+}
+
+// Support for the legacy Cargo build-dir layout.
+// See:
+// - https://github.com/rust-lang/cargo/pull/17258
+// - https://github.com/dtolnay/trybuild/issues/336
+fn try_find_legacy_build_dir_layout() -> Result<Vec<String>, Ignored> {
     // This will look something like:
     //   /path/to/crate_name/target/debug/deps/test_name-HASH
     let test_binary = env::args_os().next().ok_or(Ignored)?;
