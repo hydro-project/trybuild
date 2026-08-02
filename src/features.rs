@@ -7,8 +7,8 @@ use std::fs;
 use std::path::PathBuf;
 
 pub(crate) fn find() -> Option<Vec<String>> {
-    // NOTE: We try the legacy layout first while the new Cargo build-dir layout is
-    //       still new. Eventually we should flip these to avoid unesscary file IO.
+    // We try the legacy layout first while the new Cargo build-dir layout is
+    // still new. Eventually we should flip these.
     try_find_legacy_build_dir_layout()
         .or_else(|_| try_find())
         .ok()
