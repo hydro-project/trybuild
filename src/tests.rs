@@ -18,6 +18,7 @@ macro_rules! test_normalize {
                 path_dependencies: &[crate::run::PathDependency {
                     name: String::from("diesel"),
                     normalized_path: crate::directory::Directory::new("/home/user/documents/rust/diesel/diesel"),
+                    normalization: crate::normalize::Normalization::PathDependencies,
                 }],
             };
             let original = $original;

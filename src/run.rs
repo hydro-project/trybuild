@@ -7,7 +7,7 @@ use crate::expand::{ExpandedTest, expand_globs};
 use crate::flock::Lock;
 use crate::manifest::{Bin, Manifest, Name, Package, Workspace};
 use crate::message::{self, Fail, Warn};
-use crate::normalize::{self, Context, Variations};
+use crate::normalize::{self, Context, Normalization, Variations};
 use crate::path::CanonicalPath;
 use crate::{Expected, Runner, Test, features};
 use serde_derive::Deserialize;
@@ -39,6 +39,7 @@ pub(crate) struct Project {
 pub(crate) struct PathDependency {
     pub name: String,
     pub normalized_path: Directory,
+    pub normalization: Normalization,
 }
 
 struct Report {
@@ -130,22 +131,38 @@ impl Runner {
 
         let mut features = features::find();
 
-        let path_dependencies = source_manifest
-            .dependencies
-            .iter()
-            .filter_map(|(name, dep)| {
-                let path = dep.path.as_ref()?;
-                if packages.iter().any(|p| &p.name == name) {
+        let mut path_dependencies = Vec::new();
+        let mut collect_path_dependencies =
+            |dependencies: &Map<String, Dependency>, normalization: Normalization| {
+                for (name, dep) in dependencies {
+                    if let Some(path) = &dep.path
                     // Skip path dependencies coming from the workspace itself
-                    None
-                } else {
-                    Some(PathDependency {
-                        name: name.clone(),
-                        normalized_path: path.canonicalize().ok()?,
-                    })
+                    && !packages.iter().any(|p| &p.name == name)
+                    && let Ok(normalized_path) = path.canonicalize()
+                    {
+                        path_dependencies.push(PathDependency {
+                            name: name.clone(),
+                            normalized_path,
+                            normalization,
+                        });
+                    }
                 }
-            })
-            .collect();
+            };
+        collect_path_dependencies(
+            &source_manifest.dependencies,
+            Normalization::PathDependencies,
+        );
+        collect_path_dependencies(
+            &source_manifest.dev_dependencies,
+            Normalization::MorePathDependencies,
+        );
+        for target in source_manifest.target.values() {
+            collect_path_dependencies(&target.dependencies, Normalization::MorePathDependencies);
+            collect_path_dependencies(
+                &target.dev_dependencies,
+                Normalization::MorePathDependencies,
+            );
+        }
 
         let crate_name = &source_manifest.package.name;
         let project_dir = path!(target_dir / "tests" / "trybuild" / crate_name /);

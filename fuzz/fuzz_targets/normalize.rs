@@ -9,7 +9,7 @@ mod directory;
 mod normalize;
 
 use crate::directory::Directory;
-use crate::normalize::Context;
+use crate::normalize::{Context, Normalization};
 use crate::run::PathDependency;
 use libfuzzer_sys::fuzz_target;
 use std::path::Path;
@@ -18,6 +18,7 @@ mod run {
     pub struct PathDependency {
         pub name: String,
         pub normalized_path: super::Directory,
+        pub normalization: super::Normalization,
     }
 }
 
@@ -34,6 +35,7 @@ fuzz_target!(|string: &str| {
         path_dependencies: &[PathDependency {
             name: String::from("diesel"),
             normalized_path: Directory::new("/home/user/documents/rust/diesel/diesel"),
+            normalization: Normalization::PathDependencies,
         }],
     };
     let _ = normalize::diagnostics(string, context);
