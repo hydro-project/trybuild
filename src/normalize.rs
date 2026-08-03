@@ -21,8 +21,8 @@ pub(crate) struct Context<'a> {
 
 macro_rules! normalizations {
     ($($name:ident,)*) => {
-        #[derive(PartialOrd, PartialEq, Copy, Clone)]
-        enum Normalization {
+        #[derive(PartialOrd, PartialEq, Copy, Clone, Debug)]
+        pub(crate) enum Normalization {
             $($name,)*
         }
 
@@ -65,6 +65,7 @@ normalizations! {
     HeadingNote,
     UnindentSuggestion,
     CustomRegistry,
+    MorePathDependencies,
     // New normalization steps are to be inserted here at the end so that any
     // snapshots saved before your normalization change remain passing.
 }
@@ -265,16 +266,19 @@ impl<'a> Filter<'a> {
             }
             if self.normalization >= PathDependencies && !other_crate {
                 for path_dep in self.context.path_dependencies {
-                    let path_dep_pat = path_dep
-                        .normalized_path
-                        .to_string_lossy()
-                        .to_ascii_lowercase()
-                        .replace('\\', "/");
-                    if let Some(i) = line_lower.find(&path_dep_pat) {
-                        let var = format!("${}", path_dep.name.to_uppercase().replace('-', "_"));
-                        line.replace_range(i..i + path_dep_pat.len() - 1, &var);
-                        other_crate = true;
-                        break;
+                    if self.normalization >= path_dep.normalization {
+                        let path_dep_pat = path_dep
+                            .normalized_path
+                            .to_string_lossy()
+                            .to_ascii_lowercase()
+                            .replace('\\', "/");
+                        if let Some(i) = line_lower.find(&path_dep_pat) {
+                            let var =
+                                format!("${}", path_dep.name.to_uppercase().replace('-', "_"));
+                            line.replace_range(i..i + path_dep_pat.len() - 1, &var);
+                            other_crate = true;
+                            break;
+                        }
                     }
                 }
             }
