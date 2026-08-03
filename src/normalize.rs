@@ -265,21 +265,32 @@ impl<'a> Filter<'a> {
                 }
             }
             if self.normalization >= PathDependencies && !other_crate {
+                let mut longest_match = None;
+                let mut length_of_longest_match = 0;
                 for path_dep in self.context.path_dependencies {
-                    if self.normalization >= path_dep.normalization {
+                    if self.normalization >= path_dep.normalization
+                        && path_dep.normalized_path.as_os_str().len() > length_of_longest_match
+                    {
                         let path_dep_pat = path_dep
                             .normalized_path
                             .to_string_lossy()
                             .to_ascii_lowercase()
                             .replace('\\', "/");
                         if let Some(i) = line_lower.find(&path_dep_pat) {
-                            let var =
-                                format!("${}", path_dep.name.to_uppercase().replace('-', "_"));
-                            line.replace_range(i..i + path_dep_pat.len() - 1, &var);
-                            other_crate = true;
-                            break;
+                            longest_match = Some((i, path_dep, path_dep_pat));
+                            length_of_longest_match = path_dep.normalized_path.as_os_str().len();
+                            if self.normalization < MorePathDependencies {
+                                // Snapshots prior to https://github.com/dtolnay/trybuild/pull/341
+                                // use the first match without considering length.
+                                break;
+                            }
                         }
                     }
+                }
+                if let Some((i, path_dep, path_dep_pat)) = longest_match {
+                    let var = format!("${}", path_dep.name.to_uppercase().replace('-', "_"));
+                    line.replace_range(i..i + path_dep_pat.len() - 1, &var);
+                    other_crate = true;
                 }
             }
             if self.normalization >= RustLib && !other_crate {
