@@ -11,6 +11,7 @@ use crate::normalize::{self, Context, Normalization, Variations};
 use crate::path::CanonicalPath;
 use crate::{Expected, Runner, Test, features};
 use serde_derive::Deserialize;
+use std::cmp::Reverse;
 use std::collections::{BTreeMap as Map, BTreeSet as Set};
 use std::env;
 use std::ffi::{OsStr, OsString};
@@ -163,6 +164,10 @@ impl Runner {
                 Normalization::MorePathDependencies,
             );
         }
+
+        // Sort by decreasing path length so that a linear scan can use the
+        // first match knowing it is the longest match.
+        path_dependencies.sort_by_key(|dep| Reverse(dep.normalized_path.as_os_str().len()));
 
         let crate_name = &source_manifest.package.name;
         let project_dir = path!(target_dir / "tests" / "trybuild" / crate_name /);
