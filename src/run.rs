@@ -130,22 +130,27 @@ impl Runner {
 
         let mut features = features::find();
 
-        let path_dependencies = source_manifest
-            .dependencies
-            .iter()
-            .filter_map(|(name, dep)| {
-                let path = dep.path.as_ref()?;
-                if packages.iter().any(|p| &p.name == name) {
+        let mut path_dependencies = Vec::new();
+        let mut collect_path_dependencies = |dependencies: &Map<String, Dependency>| {
+            for (name, dep) in dependencies {
+                if let Some(path) = &dep.path
                     // Skip path dependencies coming from the workspace itself
-                    None
-                } else {
-                    Some(PathDependency {
+                    && !packages.iter().any(|p| &p.name == name)
+                    && let Ok(normalized_path) = path.canonicalize()
+                {
+                    path_dependencies.push(PathDependency {
                         name: name.clone(),
-                        normalized_path: path.canonicalize().ok()?,
-                    })
+                        normalized_path,
+                    });
                 }
-            })
-            .collect();
+            }
+        };
+        collect_path_dependencies(&source_manifest.dependencies);
+        collect_path_dependencies(&source_manifest.dev_dependencies);
+        for target in source_manifest.target.values() {
+            collect_path_dependencies(&target.dependencies);
+            collect_path_dependencies(&target.dev_dependencies);
+        }
 
         let crate_name = &source_manifest.package.name;
         let project_dir = path!(target_dir / "tests" / "trybuild" / crate_name /);
